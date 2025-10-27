@@ -9,6 +9,7 @@ pub struct Session {
     pub path: PathBuf,
     pub size: u64,
     pub modified: SystemTime,
+    pub content_preview: Option<String>,
 }
 
 impl Session {
@@ -18,6 +19,7 @@ impl Session {
             path,
             size,
             modified,
+            content_preview: None,
         }
     }
 
@@ -56,6 +58,7 @@ pub struct Project {
     pub path: PathBuf,
     pub sessions: Vec<Session>,
     pub total_size: u64,
+    pub latest_content: Option<String>,
 }
 
 impl Project {
@@ -65,6 +68,7 @@ impl Project {
             path,
             sessions: Vec::new(),
             total_size: 0,
+            latest_content: None,
         }
     }
 
@@ -152,6 +156,7 @@ mod tests {
             SystemTime::now(),
         );
         assert_eq!(session.format_size(), "1.0 KB");
+        assert_eq!(session.content_preview, None);
 
         let session = Session::new(
             "test.json".to_string(),
@@ -179,6 +184,7 @@ mod tests {
         assert_eq!(project.name, "test-project");
         assert_eq!(project.sessions.len(), 0);
         assert_eq!(project.total_size, 0);
+        assert_eq!(project.latest_content, None);
     }
 
     #[test]

@@ -1,6 +1,8 @@
 use crate::models::{Project, Session, Statistics};
 use anyhow::{anyhow, Result};
-use std::fs;
+use serde_json;
+use std::fs::{self, File};
+use std::io::{BufRead, BufReader};
 use std::path::{Path, PathBuf};
 
 pub struct SessionManager {
@@ -64,6 +66,11 @@ impl SessionManager {
                     project.add_session(session);
                 }
 
+                // Extract latest content from the most recent session
+                if let Some(latest_session) = project.sessions.first() {
+                    project.latest_content = self.extract_session_preview(&latest_session.path);
+                }
+
                 // Add projects even if they have no sessions (user might want to delete empty projects)
                 projects.push(project);
             }
@@ -100,7 +107,12 @@ impl SessionManager {
                             .unwrap_or("unknown")
                             .to_string();
 
-                        sessions.push(Session::new(session_name, path, size, modified));
+                        let mut session = Session::new(session_name, path, size, modified);
+                        
+                        // Extract content preview for this session
+                        session.content_preview = self.extract_session_preview(&session.path);
+
+                        sessions.push(session);
                     }
                 }
             }
@@ -148,6 +160,93 @@ impl SessionManager {
             .iter()
             .filter(|session| session.get_age_days() > days)
             .collect()
+    }
+
+    fn extract_session_preview(&self, session_path: &Path) -> Option<String> {
+        let file = match File::open(session_path) {
+            Ok(file) => file,
+            Err(_) => return None,
+        };
+
+        let reader = BufReader::new(file);
+        
+        // Read first few lines to find a meaningful content
+        for line in reader.lines().take(5) {
+            match line {
+                Ok(content) => {
+                    let trimmed = content.trim();
+                    if !trimmed.is_empty() {
+                        // Try to parse as JSON to extract meaningful content
+                        if let Ok(json_value) = serde_json::from_str::<serde_json::Value>(trimmed) {
+                            // Look for common message content fields
+                            if let Some(content_field) = self.extract_content_from_json(&json_value) {
+                                return Some(self.truncate_content(&content_field, 80));
+                            }
+                        } else {
+                            // If not JSON, use the line as-is
+                            return Some(self.truncate_content(trimmed, 80));
+                        }
+                    }
+                }
+                Err(_) => continue,
+            }
+        }
+        
+        None
+    }
+
+    fn extract_content_from_json(&self, json: &serde_json::Value) -> Option<String> {
+        // Look for content in Claude session JSON format
+        if let Some(obj) = json.as_object() {
+            // First check if there's a message field with content
+            if let Some(message) = obj.get("message") {
+                if let Some(message_obj) = message.as_object() {
+                    if let Some(content) = message_obj.get("content") {
+                        match content {
+                            serde_json::Value::String(s) => return Some(s.clone()),
+                            serde_json::Value::Array(arr) => {
+                                // If it's an array, try to get text from first text element
+                                for item in arr {
+                                    if let Some(item_obj) = item.as_object() {
+                                        if let Some(text) = item_obj.get("text").and_then(|v| v.as_str()) {
+                                            return Some(text.to_string());
+                                        }
+                                    }
+                                }
+                            }
+                            _ => {}
+                        }
+                    }
+                }
+            }
+            
+            // Fallback: try direct content field
+            if let Some(content) = obj.get("content") {
+                match content {
+                    serde_json::Value::String(s) => return Some(s.clone()),
+                    serde_json::Value::Array(arr) => {
+                        for item in arr {
+                            if let Some(item_obj) = item.as_object() {
+                                if let Some(text) = item_obj.get("text").and_then(|v| v.as_str()) {
+                                    return Some(text.to_string());
+                                }
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+        None
+    }
+
+    fn truncate_content(&self, content: &str, max_len: usize) -> String {
+        if content.chars().count() <= max_len {
+            content.to_string()
+        } else {
+            let truncated: String = content.chars().take(max_len.saturating_sub(3)).collect();
+            format!("{}...", truncated)
+        }
     }
 
 

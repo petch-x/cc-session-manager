@@ -28,13 +28,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let projects = session_manager.scan_projects()?;
     println!("✅ Found {} projects", projects.len());
     
-    // Show only our test projects
-    let test_projects: Vec<_> = projects.iter()
-        .filter(|p| p.name.starts_with("test-project"))
-        .collect();
-    
-    println!("📋 Test projects found:");
-    for project in &test_projects {
+    // Show all projects to test the new feature
+    println!("📋 All projects found:");
+    for project in &projects {
         println!("  📁 {} ({} sessions, {})", 
             project.name, 
             project.sessions.len(), 
@@ -43,17 +39,29 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         // Show sessions in each project
         for (i, session) in project.sessions.iter().enumerate() {
             let age = session.get_age_days();
-            println!("    [{}] {} ({}, {} days ago)", 
-                i + 1, 
-                session.name, 
-                session.format_size(),
-                age);
+            match &session.content_preview {
+                Some(content) => {
+                    println!("    [{}] {} ({}, {} days ago) ► {}", 
+                        i + 1, 
+                        session.name, 
+                        session.format_size(),
+                        age,
+                        content);
+                }
+                None => {
+                    println!("    [{}] {} ({}, {} days ago)", 
+                        i + 1, 
+                        session.name, 
+                        session.format_size(),
+                        age);
+                }
+            }
         }
     }
     
     // Test 3: Session selection simulation
-    if !test_projects.is_empty() {
-        let test_project = &test_projects[0];
+    if !projects.is_empty() {
+        let test_project = &projects[0];
         if !test_project.sessions.is_empty() {
             println!("\n🎯 Simulating session selection for project: {}", test_project.name);
             

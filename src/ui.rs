@@ -131,13 +131,28 @@ impl UI {
                     .map(|dt| dt.format("%Y-%m-%d %H:%M").to_string())
                     .unwrap_or_else(|_| "Unknown".to_string());
                 
-                println!(
-                    "{} {} ({}, {} วันที่แล้ว)",
-                    selected,
-                    session.name,
-                    session.format_size(),
-                    age
-                );
+                // Show session with content preview if available
+                match &session.content_preview {
+                    Some(content) => {
+                        println!(
+                            "{} {} ({}, {} วันที่แล้ว) ► {}",
+                            selected,
+                            session.name,
+                            session.format_size(),
+                            age,
+                            content
+                        );
+                    }
+                    None => {
+                        println!(
+                            "{} {} ({}, {} วันที่แล้ว)",
+                            selected,
+                            session.name,
+                            session.format_size(),
+                            age
+                        );
+                    }
+                }
             }
             println!();
             println!("[a] Select All");
