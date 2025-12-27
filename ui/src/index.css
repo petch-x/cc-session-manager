@@ -1,0 +1,182 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Dark mode as default - Slate-900 base */
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    /* Card & Popover */
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    /* Teal/Green Primary Colors */
+    --primary: 174 62% 40%;
+    --primary-foreground: 210 40% 98%;
+
+    /* Secondary - Glassy gray */
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    /* Muted */
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    /* Accent - Teal tint */
+    --accent: 174 62% 30%;
+    --accent-foreground: 210 40% 98%;
+
+    /* Destructive */
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Border & Input */
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 174 62% 40%;
+
+    --radius: 0.75rem;
+  }
+
+  /* Light mode - keep for compatibility */
+  .light {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 174 62% 40%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 174 62% 40%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    /* Subtle gradient background */
+    background-image:
+      radial-gradient(ellipse 80% 80% at 50% -20%, rgba(20, 184, 166, 0.15), transparent),
+      radial-gradient(ellipse 60% 60% at 80% 80%, rgba(99, 102, 241, 0.1), transparent),
+      radial-gradient(ellipse 50% 50% at 20% 60%, rgba(20, 184, 166, 0.08), transparent);
+    background-attachment: fixed;
+  }
+}
+
+/* Glassmorphism Utilities */
+@layer utilities {
+  /* Base glass effect */
+  .glass {
+    background: rgba(30, 41, 59, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Glass card variant */
+  .glass-card {
+    @apply glass rounded-xl;
+  }
+
+  /* Glass button variant */
+  .glass-btn {
+    @apply glass rounded-lg transition-all duration-300;
+  }
+
+  .glass-btn:hover {
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(20, 184, 166, 0.4);
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.2);
+  }
+
+  /* Hover glow effect */
+  .glass-hover:hover {
+    background: rgba(30, 41, 59, 0.85);
+    border-color: rgba(20, 184, 166, 0.3);
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.15);
+    transform: translateY(-1px);
+  }
+
+  /* Glass input */
+  .glass-input {
+    @apply bg-glass/50 border border-white/10 rounded-lg px-4 py-2;
+    @apply focus:outline-none focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500/50;
+    @apply placeholder:text-muted-foreground/50;
+  }
+
+  /* Glass overlay for dialogs */
+  .glass-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
+
+  /* Lighter glass for headers/emphasis */
+  .glass-light {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  /* Teal glow accent */
+  .teal-glow {
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+  }
+
+  /* Animated gradient border */
+  .gradient-border {
+    position: relative;
+  }
+  .gradient-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, rgba(20, 184, 166, 0.5), rgba(99, 102, 241, 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(20, 184, 166, 0.4);
+}

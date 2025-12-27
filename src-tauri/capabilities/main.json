@@ -1,0 +1,12 @@
+{
+  "identifier": "main",
+  "description": "Main capability for cc-session-manager",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "core:menu:default",
+    "core:window:default",
+    "core:app:default",
+    "plugin:shell:default"
+  ]
+}

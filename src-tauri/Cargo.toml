@@ -1,0 +1,25 @@
+[package]
+name = "cc-session-manager-tauri"
+version = "0.2.0"
+description = "Tauri GUI for Claude Code Session Manager"
+authors = ["Petch"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+tauri = { version = "2.0", features = ["tray-icon"] }
+cc-session-manager = { path = "..", features = ["gui"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[features]
+default = []
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "z"
+strip = true

@@ -1,1 +1,23 @@
+# Rust build artifacts
 /target
+Cargo.lock
+
+# Tauri build artifacts
+src-tauri/target
+src-tauri/src-tauri
+
+# Frontend build artifacts
+ui/dist
+ui/node_modules
+
+# IDE and OS files
+.DS_Store
+*.log
+.env
+.env.local
+.idea
+.vscode
+*.swp
+*.swo
+*~
+*.dmg
